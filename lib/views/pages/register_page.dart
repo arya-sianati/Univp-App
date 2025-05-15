@@ -6,68 +6,61 @@ import 'package:univp/data/notifiers.dart';
 import 'package:univp/views/widget_tree.dart';
 import 'package:univp/views/widgets/hero_widget.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
+  final TextEditingController controllerEmail = TextEditingController();
   final TextEditingController controllerUsername = TextEditingController();
   final TextEditingController controllerPw = TextEditingController();
-  bool isLoading = false;
 
   @override
   void dispose() {
+    controllerEmail.dispose();
     controllerUsername.dispose();
     controllerPw.dispose();
     super.dispose();
   }
 
-  Future<void> loginUser() async {
-    setState(() => isLoading = true);
+  Future<void> registerUser() async {
+    final email = controllerEmail.text.trim();
+    final username = controllerUsername.text.trim();
+    final password = controllerPw.text;
 
-    final url = Uri.parse('https://univp.ddns.net/api/login/');
+    final url = Uri.parse('https://univp.ddns.net/api/register/');
+
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'username': controllerUsername.text.trim(),
-        'password': controllerPw.text,
+        'username': username,
+        'email': email,
+        'password': password,
       }),
     );
 
-    setState(() => isLoading = false);
-
-    if (response.statusCode == 200) {
-      // final tokens = jsonDecode(response.body);
+    if (response.statusCode == 201) {
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const WidgetTree()),
       );
     } else {
-      final errorMessage = _parseError(response);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
-    }
-  }
-
-  String _parseError(http.Response response) {
-    try {
       final data = jsonDecode(response.body);
-      return data['error'] ?? 'Login failed';
-    } catch (_) {
-      return 'Unexpected server error';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(data['error'] ?? 'Registration failed')),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Login")),
+      appBar: AppBar(title: const Text("Register")),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(50.0),
@@ -77,6 +70,16 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 const HeroWidget(),
                 const SizedBox(height: 50),
+                TextField(
+                  controller: controllerEmail,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
                 TextField(
                   controller: controllerUsername,
                   decoration: InputDecoration(
@@ -102,7 +105,7 @@ class _LoginPageState extends State<LoginPage> {
                   valueListenable: isDarkModeNotifier,
                   builder: (context, isDarkMode, child) {
                     return FilledButton(
-                      onPressed: isLoading ? null : loginUser,
+                      onPressed: registerUser,
                       style: FilledButton.styleFrom(
                         backgroundColor:
                             isDarkMode ? Colors.white : Colors.black,
@@ -111,9 +114,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         minimumSize: const Size(double.infinity, 50),
                       ),
-                      child: isLoading
-                          ? SizedBox(width: 20, height: 20, child: const CircularProgressIndicator())
-                          : const Text('Login'),
+                      child: const Text('Register'),
                     );
                   },
                 ),

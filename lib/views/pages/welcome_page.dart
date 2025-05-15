@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:univp/data/notifiers.dart';
 import 'package:univp/views/pages/login_page.dart';
-import 'package:univp/views/widget_tree.dart';
+import 'package:univp/views/pages/register_page.dart';
 import 'package:univp/views/widgets/hero_widget.dart';
 
 class WelcomePage extends StatelessWidget {
@@ -28,7 +28,7 @@ class WelcomePage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const WidgetTree()),
+                      MaterialPageRoute(builder: (context) => const RegisterPage()),
                     );
                   },
                   style: FilledButton.styleFrom(
