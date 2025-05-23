@@ -51,9 +51,10 @@ class _RegisterPageState extends State<RegisterPage> {
 
     if (response.statusCode == 201) {
       if (!mounted) return;
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const WidgetTree()),
+        (route) => false,
       );
     } else {
       final data = jsonDecode(response.body);

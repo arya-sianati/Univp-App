@@ -44,9 +44,10 @@ class _LoginPageState extends State<LoginPage> {
     if (response.statusCode == 200) {
       // final tokens = jsonDecode(response.body);
       if (!mounted) return;
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const WidgetTree()),
+        (route) => false,
       );
     } else {
       final errorMessage = _parseError(response);
